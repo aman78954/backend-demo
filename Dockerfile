@@ -1,23 +1,27 @@
-# Use official OpenJDK image
+# 1. Use the official OpenJDK image
 FROM openjdk:17-jdk-slim
 
-# Set working directory
+# 2. Set working directory
 WORKDIR /app
 
-# Copy wrapper scripts first and make them executable
-COPY mvnw .
+# 3. Copy only necessary files for Maven wrapper first
+COPY mvnw mvnw
 COPY .mvn .mvn
+
+# 4. Make mvnw executable
 RUN chmod +x mvnw
 
-# Copy pom.xml and download dependencies
+# 5. Copy pom.xml separately for caching dependencies
 COPY pom.xml .
+
+# 6. Pre-fetch dependencies (optional but improves build speed)
 RUN ./mvnw dependency:go-offline
 
-# Now copy the rest of the app source
+# 7. Now copy the rest of the source code
 COPY . .
 
-# Build the project (skip tests)
+# 8. Package the app (skip tests)
 RUN ./mvnw clean package -DskipTests
 
-# Run the built jar
+# 9. Run the built JAR
 CMD ["java", "-jar", "target/springboot-mongodb-demo-0.0.1-SNAPSHOT.jar"]
