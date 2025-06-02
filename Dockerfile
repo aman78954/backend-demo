@@ -9,7 +9,10 @@ COPY .mvn .mvn
 COPY mvnw .
 COPY pom.xml .
 
-# Download dependencies (caching optimization)
+# Make the Maven wrapper executable ✅✅✅
+RUN chmod +x mvnw
+
+# Download dependencies (optional but improves cache)
 RUN ./mvnw dependency:go-offline
 
 # Copy the entire project
